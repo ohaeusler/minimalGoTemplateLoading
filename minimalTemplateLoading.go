@@ -52,14 +52,17 @@ func (tL *templateLoader) cacheTemplate(tmplData templateData) {
 	tL.cacheLock.Unlock()
 }
 
-//GetTemplate loads a template. If the template isn't cached, it well be loaded from disk an gets cached. name should be the filename without filetype
+//GetTemplate loads a template and the baseTemplates. If the template isn't cached, it will be loaded from disk an gets cached, as long caching is active.
+//name is the name of the template to load
 func (tL *templateLoader) GetTemplate(name string) (tmpl *template.Template) {
 	tL.cacheLock.RLock()
 	tmpl, existing := tL.cache[name]
 	go tL.cacheLock.RUnlock()
 	if !existing || !tL.cacheActive {
+		var err error
 		tmpls := append(tL.baseTemplates, tL.path+"/"+name+tL.fileExtension)
-		tmpl, _ = template.Must(template.ParseFiles(tmpls...)).Clone()
+		tmpl, err = template.Must(template.ParseFiles(tmpls...)).Clone()
+		templateLogger.HandleErrF(err, "Load template file: \""+tL.path+"/"+name+tL.fileExtension+"\"")
 		tmplData := templateData{
 			Name: name,
 			Tmpl: tmpl,
