@@ -12,7 +12,7 @@ type templateData struct {
 	Tmpl *template.Template
 }
 
-var templateLogger gOliLog.GOliLogger = gOliLog.InitLogger("panel.schule - Template", 1)
+var templateLogger gOliLog.GOliLogger = gOliLog.InitLogger("TemplateLoader", 1)
 
 type templateLoader struct {
 	cacheActive   bool
